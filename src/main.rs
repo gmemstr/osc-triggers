@@ -1,24 +1,26 @@
+extern crate inputbot;
+
 use std::{net::{SocketAddrV4, UdpSocket}, str::FromStr};
 
 use rosc::OscPacket;
 use toml;
-use serde::Deserialize;
-use inputbot::{KeybdKey, KeybdKey::*};
+use serde::{Deserialize, Serialize};
+use inputbot::{KeybdKey, KeybdKey::*, get_keybd_key};
 
 // Configuration struct with mapping of OSC addresses to keyboard keys, and a general server configuration.
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize)]
 struct Config {
 	server: ServerConfig,
 	// Mappings is called mapping in config
 	#[serde(rename = "mapping")]
 	mappings: Vec<EventKeyMapping>,
 }
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize)]
 struct EventKeyMapping {
 	event: String,
 	key: String,
 }
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize)]
 struct ServerConfig {
 	port: u16,
 }
@@ -34,12 +36,17 @@ fn main() {
 
 	let mut event_key_map = std::collections::HashMap::new();
 	for mapping in config.mappings {
-		// Convert the key string to a KeybdKey
+		// Convert the key string to a KeybdKey. First try to convert it to an F key, then to a normal key by matching the char.
 		let key = match to_fkey(&mapping.key) {
 			Some(k) => k,
 			None => {
-				println!("Invalid key: {}", mapping.key);
-				continue;
+				match mapping.key.chars().next() {
+					Some(c) => get_keybd_key(c).unwrap(),
+					None => {
+						println!("Invalid key: {}", mapping.key);
+						return;
+					}
+				}
 			}
 		};
 		event_key_map.insert(mapping.event, key);
@@ -71,6 +78,18 @@ fn main() {
 }
 
 fn load_config() -> Result<Config, String> {
+	// If the config file isn't found, create one with default values
+	if !std::path::Path::new("config.toml").exists() {
+		let default_config = Config {
+			server: ServerConfig {
+				port: 9000,
+			},
+			mappings: vec![],
+		};
+		let toml = toml::to_string_pretty(&default_config).map_err(|e| e.to_string())?;
+		std::fs::write("config.toml", toml).map_err(|e| e.to_string())?;
+		println!("Created default config file at config.toml");
+	}
 	let config_file = std::fs::read_to_string("config.toml").map_err(|e| e.to_string())?;
 	let config: Config = toml::from_str(&config_file).map_err(|e| e.to_string())?;
 	Ok(config)
@@ -79,6 +98,10 @@ fn load_config() -> Result<Config, String> {
 fn handle_packet(packet: OscPacket, mappings: &std::collections::HashMap<String, KeybdKey>) {
     match packet {
         OscPacket::Message(msg) => {
+			// Print message
+			println!("OSC Message: {:?}", msg);
+			// Print address
+			println!("OSC Address: {}", msg.addr);
             // Match event to key
 			let key = match mappings.get(&msg.addr) {
 				Some(k) => k,
@@ -87,6 +110,7 @@ fn handle_packet(packet: OscPacket, mappings: &std::collections::HashMap<String,
 				}
 			};
 			// Press key
+			println!("Pressing key: {:?}", key);
 			key.press();
         }
         OscPacket::Bundle(bundle) => {
