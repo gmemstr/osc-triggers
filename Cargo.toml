@@ -7,3 +7,6 @@ edition = "2021"
 
 [dependencies]
 inputbot = "0.5.1"
+rosc = "0.10.0"
+serde = { version = "1.0.160", features = ["derive"] }
+toml = "0.7.3"
