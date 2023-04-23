@@ -42,6 +42,9 @@
           buildInputs = with pkgs; [
             # Add additional build inputs here
             pkg-config
+            xorg.libX11
+            xorg.libXtst
+            libinput
           ] ++ lib.optionals pkgs.stdenv.isDarwin [
             # Additional darwin specific inputs can be set here
             pkgs.libiconv
