@@ -1,4 +1,4 @@
-image: nixos/nix
+image: nixos/latest
 sources:
   - https://git.sr.ht/~gmem/osc-triggers
 tasks:
