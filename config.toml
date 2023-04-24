@@ -1,5 +1,5 @@
 [[mapping]]
-event = "/avatars/parameters/MuteSelf"
+event = "/avatar/parameters/MuteSelf"
 key = "F24"
 
 [server]
