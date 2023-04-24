@@ -21,6 +21,8 @@
       url = "github:rustsec/advisory-db";
       flake = false;
     };
+    systems.url = "github:nix-systems/x86_64-linux";
+    flake-utils.inputs.systems.follows = "systems";
   };
 
   outputs = { self, nixpkgs, crane, fenix, flake-utils, advisory-db, ... }:
@@ -139,6 +141,11 @@
             cargo
             rustc
             rust-analyzer
+            hut
+            pkg-config
+            xorg.libX11
+            xorg.libXtst
+            libinput
           ];
         };
       });
