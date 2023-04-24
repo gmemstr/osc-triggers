@@ -9,7 +9,6 @@ use inputbot::{get_keybd_key, KeybdKey, KeybdKey::*};
 use rosc::OscPacket;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use toml;
 
 // Configuration struct with mapping of OSC addresses to keyboard keys, and a general server configuration.
 #[derive(Deserialize, Serialize)]
@@ -23,10 +22,17 @@ struct Config {
 struct EventKeyMapping {
     event: String,
     key: String,
+    value: Option<String>,
 }
+
 #[derive(Deserialize, Serialize)]
 struct ServerConfig {
     port: u16,
+}
+
+struct EventCache {
+    value: Option<String>,
+    key: KeybdKey,
 }
 
 fn main() {
@@ -51,7 +57,11 @@ fn main() {
                 }
             },
         };
-        event_key_map.insert(mapping.event, key);
+        let ec = EventCache {
+            value: mapping.value,
+            key,
+        };
+        event_key_map.insert(mapping.event, ec);
     }
 
     println!("Starting OSC server on port {}...", config.server.port);
@@ -95,7 +105,7 @@ fn load_config() -> Result<Config, String> {
     Ok(config)
 }
 
-fn handle_packet(packet: OscPacket, mappings: &HashMap<String, KeybdKey>) {
+fn handle_packet(packet: OscPacket, mappings: &HashMap<String, EventCache>) {
     match packet {
         OscPacket::Message(msg) => {
             // Print message
@@ -103,15 +113,24 @@ fn handle_packet(packet: OscPacket, mappings: &HashMap<String, KeybdKey>) {
             // Print address
             println!("OSC Address: {}", msg.addr);
             // Match event to key
-            let key = match mappings.get(&msg.addr) {
+            let reaction = match mappings.get(&msg.addr) {
                 Some(k) => k,
                 None => {
                     return;
                 }
             };
+            if reaction.value.is_some() {
+                // If the event has a value, check if the value matches the value in the config
+                if msg.args.len() != 1 {
+                    return;
+                }
+                if msg.args[0].clone().string() != reaction.value {
+                    return;
+                }
+            }
             // Press key
-            println!("Pressing key: {:?}", key);
-            key.press();
+            println!("Pressing key: {:?}", reaction.key);
+            reaction.key.press();
         }
         OscPacket::Bundle(bundle) => {
             println!("OSC Bundle: {:?}", bundle);
@@ -121,8 +140,8 @@ fn handle_packet(packet: OscPacket, mappings: &HashMap<String, KeybdKey>) {
 
 // Translate "F1", "F2", "F3" etc to corresponding KeybdKey.
 // inputbot doesn't currently support this natively.
-fn to_fkey(key: &String) -> Option<KeybdKey> {
-    match key.as_str() {
+fn to_fkey(key: &str) -> Option<KeybdKey> {
+    match key {
         "F1" => Some(F1Key),
         "F2" => Some(F2Key),
         "F3" => Some(F3Key),
@@ -155,30 +174,8 @@ mod tests {
     // Test to_fkey
     #[test]
     fn test_to_fkey() {
-        assert_eq!(super::to_fkey(&"F1".to_string()), Some(super::F1Key));
-        assert_eq!(super::to_fkey(&"F2".to_string()), Some(super::F2Key));
-        assert_eq!(super::to_fkey(&"F3".to_string()), Some(super::F3Key));
-        assert_eq!(super::to_fkey(&"F4".to_string()), Some(super::F4Key));
-        assert_eq!(super::to_fkey(&"F5".to_string()), Some(super::F5Key));
-        assert_eq!(super::to_fkey(&"F6".to_string()), Some(super::F6Key));
-        assert_eq!(super::to_fkey(&"F7".to_string()), Some(super::F7Key));
-        assert_eq!(super::to_fkey(&"F8".to_string()), Some(super::F8Key));
-        assert_eq!(super::to_fkey(&"F9".to_string()), Some(super::F9Key));
-        assert_eq!(super::to_fkey(&"F10".to_string()), Some(super::F10Key));
-        assert_eq!(super::to_fkey(&"F11".to_string()), Some(super::F11Key));
-        assert_eq!(super::to_fkey(&"F12".to_string()), Some(super::F12Key));
-        assert_eq!(super::to_fkey(&"F13".to_string()), Some(super::F13Key));
-        assert_eq!(super::to_fkey(&"F14".to_string()), Some(super::F14Key));
-        assert_eq!(super::to_fkey(&"F15".to_string()), Some(super::F15Key));
-        assert_eq!(super::to_fkey(&"F16".to_string()), Some(super::F16Key));
-        assert_eq!(super::to_fkey(&"F17".to_string()), Some(super::F17Key));
-        assert_eq!(super::to_fkey(&"F18".to_string()), Some(super::F18Key));
-        assert_eq!(super::to_fkey(&"F19".to_string()), Some(super::F19Key));
-        assert_eq!(super::to_fkey(&"F20".to_string()), Some(super::F20Key));
-        assert_eq!(super::to_fkey(&"F21".to_string()), Some(super::F21Key));
-        assert_eq!(super::to_fkey(&"F22".to_string()), Some(super::F22Key));
-        assert_eq!(super::to_fkey(&"F23".to_string()), Some(super::F23Key));
-        assert_eq!(super::to_fkey(&"F24".to_string()), Some(super::F24Key));
-        assert_eq!(super::to_fkey(&"F25".to_string()), None);
+        assert_eq!(super::to_fkey("F1"), Some(super::F1Key));
+        assert_eq!(super::to_fkey("F2"), Some(super::F2Key));
+        assert_eq!(super::to_fkey("F25"), None);
     }
 }
