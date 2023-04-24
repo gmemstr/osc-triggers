@@ -1,6 +1,8 @@
 image: nixos/latest
 sources:
   - https://git.sr.ht/~gmem/osc-triggers
+environment:
+  NIX_CONFIG: "experimental-features = nix-command flakes"
 tasks:
   - check: |
       echo "Running nix flake check..."
