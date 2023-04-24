@@ -1,0 +1,7 @@
+image: nixos/nix
+sources:
+  - https://git.sr.ht/~gmem/osc-triggers
+tasks:
+  - check: |
+      echo "Running nix flake check..."
+      nix flake check --keep-going --verbose
