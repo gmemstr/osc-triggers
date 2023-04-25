@@ -1,10 +1,20 @@
 image: nixos/latest
 sources:
   - https://git.sr.ht/~gmem/osc-triggers
+secrets:
+  - 5799dead-65e5-4af2-9e1c-69fdfe664e15
+packages:
+  - nixos.git
 environment:
   NIX_CONFIG: "experimental-features = nix-command flakes"
+  GITHUB_REPO: "gmemstr/osc-triggers"
 tasks:
   - check: |
       cd osc-triggers
       echo "Running nix flake check..."
       nix flake check
+  - mirror-to-github: |
+      cd osc-triggers
+      git remote add github git@github.com:$GITHUB_REPO.git
+      ssh-keyscan github.com >> ~/.ssh/known_hosts
+      git push --mirror github
