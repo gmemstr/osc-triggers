@@ -27,5 +27,5 @@ else
   result="none"
 fi
 
-echo "Result: $result"
+echo "$result"
 exit 0
