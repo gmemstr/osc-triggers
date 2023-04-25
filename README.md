@@ -1,5 +1,7 @@
 # osc-triggers
 
+[![builds.sr.ht status](https://builds.sr.ht/~gmem/osc-triggers.svg)](https://builds.sr.ht/~gmem/osc-triggers?)
+
 Easily map OSC events to keypresses.
 
 ## building
