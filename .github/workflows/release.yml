@@ -32,13 +32,14 @@ jobs:
       - name: Install dependencies
         if: matrix.os == 'ubuntu-latest'
         run: |
-          sudo apt update && sudo apt upgrade
+          sudo apt update
           sudo apt install -y libx11-dev libxtst-dev libudev-dev libinput-dev musl musl-tools
 
       - name: Build
         run: cargo build --release --target ${{ matrix.target }}
         env:
           RUSTFLAGS: -C target-feature=+crt-static
+          PKG_CONFIG_SYSROOT_DIR: /
 
       - name: Package
         run: |
