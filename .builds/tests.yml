@@ -22,5 +22,7 @@ tasks:
       if [[ $CHANGED_FILES == "source" || $CHANGED_FILES == "all" ]]; then
         git remote add github git@github.com:$GITHUB_REPO.git
         ssh-keyscan github.com >> ~/.ssh/known_hosts
+        # Pull in existing tags
+        git fetch github --tags
         git push --mirror github
       fi
