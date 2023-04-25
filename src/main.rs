@@ -77,7 +77,6 @@ fn main() {
     loop {
         match sock.recv_from(&mut buf) {
             Ok((size, addr)) => {
-                println!("Received packet with size {} from: {}", size, addr);
                 let (_, packet) = rosc::decoder::decode_udp(&buf[..size]).unwrap();
                 handle_packet(packet, &event_key_map);
             }
@@ -129,12 +128,12 @@ fn handle_packet(packet: OscPacket, mappings: &HashMap<String, EventCache>) {
                 }
             }
             // Press key
-            println!("Pressing key: {:?}", reaction.key);
+			println!("Pressing key: {:?}", reaction.key);
             reaction.key.press();
             reaction.key.release();
         }
         OscPacket::Bundle(bundle) => {
-            println!("OSC Bundle: {:?}", bundle);
+            
         }
     }
 }
