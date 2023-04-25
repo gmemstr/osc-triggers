@@ -9,6 +9,6 @@ sources:
 tasks:
 - package: |
     cd osc-triggers/website
-    tar -cvz . > ../site.tar.gz
+    tar -cvz . > ../../site.tar.gz
 - upload: |
     hut pages publish -d $site site.tar.gz
