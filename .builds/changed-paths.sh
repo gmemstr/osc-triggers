@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Get the list of changed paths in the latest commit
 changed_paths=$(git diff-tree --no-commit-id --name-only -r HEAD)

@@ -11,10 +11,11 @@ tasks:
     cd osc-triggers/website
     export CHANGED_FILES=$(../.builds/changed-paths.sh)
     if [[ $CHANGED_FILES == "website" || $CHANGED_FILES == "all" ]]; then
-      tar -cvz . > ../../site.tar.gz
+      tar -cvz . > ../site.tar.gz
     fi
 - upload: |
-    export CHANGED_FILES=$(./osc-triggers/.builds/changed-paths.sh)
+    cd osc-triggers
+    export CHANGED_FILES=$(./.builds/changed-paths.sh)
     if [[ $CHANGED_FILES == "website" || $CHANGED_FILES == "all" ]]; then
       hut pages publish -d $site site.tar.gz
     fi
