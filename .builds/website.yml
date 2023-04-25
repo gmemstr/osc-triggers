@@ -9,6 +9,12 @@ sources:
 tasks:
 - package: |
     cd osc-triggers/website
-    tar -cvz . > ../../site.tar.gz
+    export CHANGED_FILES=$(../.builds/changed-paths.sh)
+    if [[ $CHANGED_FILES == "website" || $CHANGED_FILES == "all" ]]; then
+      tar -cvz . > ../../site.tar.gz
+    fi
 - upload: |
-    hut pages publish -d $site site.tar.gz
+    export CHANGED_FILES=$(./osc-triggers/.builds/changed-paths.sh)
+    if [[ $CHANGED_FILES == "website" || $CHANGED_FILES == "all" ]]; then
+      hut pages publish -d $site site.tar.gz
+    fi
