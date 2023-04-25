@@ -1,0 +1,14 @@
+image: alpine/edge
+oauth: pages.sr.ht/PAGES:RW
+packages:
+- hut
+environment:
+  site: osc-triggers.gmem.ca
+sources:
+  - https://git.sr.ht/~gmem/osc-triggers
+tasks:
+- package: |
+    cd osc-triggers/website
+    tar -cvz . > ../site.tar.gz
+- upload: |
+    hut pages publish -d $site site.tar.gz
