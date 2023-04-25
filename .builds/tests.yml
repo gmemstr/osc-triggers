@@ -11,10 +11,16 @@ environment:
 tasks:
   - check: |
       cd osc-triggers
-      echo "Running nix flake check..."
-      nix flake check
+      export CHANGED_FILES=$(./.builds/changed-paths.sh)
+      if [[ $CHANGED_FILES == "source" || $CHANGED_FILES == "all" ]]; then
+        echo "Running nix flake check..."
+        nix flake check
+      fi
   - mirror-to-github: |
       cd osc-triggers
-      git remote add github git@github.com:$GITHUB_REPO.git
-      ssh-keyscan github.com >> ~/.ssh/known_hosts
-      git push --mirror github
+      export CHANGED_FILES=$(./.builds/changed-paths.sh)
+      if [[ $CHANGED_FILES == "source" || $CHANGED_FILES == "all" ]]; then
+        git remote add github git@github.com:$GITHUB_REPO.git
+        ssh-keyscan github.com >> ~/.ssh/known_hosts
+        git push --mirror github
+      fi
