@@ -131,6 +131,7 @@ fn handle_packet(packet: OscPacket, mappings: &HashMap<String, EventCache>) {
             // Press key
             println!("Pressing key: {:?}", reaction.key);
             reaction.key.press();
+			reaction.key.release();
         }
         OscPacket::Bundle(bundle) => {
             println!("OSC Bundle: {:?}", bundle);
