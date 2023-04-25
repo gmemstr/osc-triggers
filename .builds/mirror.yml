@@ -9,6 +9,7 @@ sources:
   - https://git.sr.ht/~gmem/osc-triggers # Replace with your Sourcehut repo
 tasks:
   - mirror-to-github: |
+      cd osc-triggers
       git remote add github git@github.com:$GITHUB_REPO.git
       ssh-keyscan github.com >> ~/.ssh/known_hosts
       git push --mirror github
