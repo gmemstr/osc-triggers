@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>OSC Triggers</title>
+    <meta name="description" content="OSC Keybind Triggers" />
+    <meta name="author" content="Gabriel Simmer" />
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <link rel="stylesheet" type="text/css" href="/xess.css" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏳️‍🌈</text></svg>">
+</head>
+
+<body>
+  <main>
+	<h1>OSC Triggers</h1>
+	<h2>Trigger keypresses and macros from OSC messages</h2>
+	<hr />
+	<h3>What is OSC?</h3>
+	<p>OSC is a communication protocol primarily intended for sound devices but has been
+	  adopted for other things as well, such as VRChat leveraging it to make interactions
+	  between the game and other software possible.</p>
+	<h3>What is OSC Triggers?</h3>
+	<p>OSC Triggers allows us to map "events" to actual keypresses on the host computer,
+	  either over the network or from localhost. It's currently developed with a focus
+	  on VRChat OSC integration, but is written in a fairly generic way.</p>
+	<h3>How do I use it?</h3>
+	<p>OSC Triggers doesn't <i>currently</i> have a user interface, but the configuration file is
+	  designed to be as straightforward as possible with <a href="https://toml.io/en/">TOML</a>.
+	  Here's an example configuration file that will issue a keypress for the F24 key
+	  when the user mutes themselves in VRChat:
+
+	  <pre><code>[[mapping]]
+event = "/avatar/parameters/MuteSelf"
+key = "F24"</code></pre>
+
+	  The event is entirely dependant on the program you're using. You can see an example
+	  list of VRChat OSC events <a href="https://raw.githubusercontent.com/vrchat-community/osc/main/files/avatar-parameters/configs/example-avatar-config.json">here</a>. Custom parameters can be added with some work in Unity.</p>
+
+	<h3>Where can I download it?</h3>
+	<p>Downloads are coming soon. If you know a bit of Rust, you can build it yourself from
+	  the repository <a href="https://git.sr.ht/~gmem/osc-triggers">here</a>.</p>
+
+	<h3>How can I get in touch?</h3>
+	<p>You can reach out with Mastodon at <a href="https://floofy.tech/@arch">floofy.tech/@arch</a>, or with Discord: <code>arch#1919</code>. No, there is no Discord server.</p>
+  </main>
+</body>
