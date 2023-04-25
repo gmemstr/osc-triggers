@@ -47,6 +47,7 @@ jobs:
           else
             tar czf ${{ matrix.artifact_name }}.tar.gz -C target/${{ matrix.target }}/release osc-triggers
           fi
+        shell: bash
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
