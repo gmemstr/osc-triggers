@@ -13,7 +13,7 @@ use std::collections::HashMap;
 // Configuration struct with mapping of OSC addresses to keyboard keys, and a general server configuration.
 #[derive(Deserialize, Serialize)]
 struct Config {
-    server: ServerConfig,
+    server: Option<ServerConfig>,
     // Mappings is called mapping in config for ease of use.
     #[serde(rename = "mapping")]
     mappings: Vec<EventKeyMapping>,
@@ -64,8 +64,9 @@ fn main() {
         event_key_map.insert(mapping.event, ec);
     }
 
-    println!("Starting OSC server on port {}...", config.server.port);
-    let addr = match SocketAddrV4::from_str(format!("127.0.0.1:{}", config.server.port).as_str()) {
+    let port = config.server.unwrap().port;
+    println!("Starting OSC server on port {}...", port);
+    let addr = match SocketAddrV4::from_str(format!("127.0.0.1:{}", port).as_str()) {
         Ok(addr) => addr,
         Err(_) => panic!("Unable to match address"),
     };
@@ -92,7 +93,7 @@ fn load_config() -> Result<Config, String> {
     // If the config file isn't found, create one with default values
     if !std::path::Path::new("config.toml").exists() {
         let default_config = Config {
-            server: ServerConfig { port: 9000 },
+            server: Some(ServerConfig { port: 9000 }),
             mappings: vec![],
         };
         let toml = toml::to_string_pretty(&default_config).map_err(|e| e.to_string())?;
@@ -100,7 +101,11 @@ fn load_config() -> Result<Config, String> {
         println!("Created default config file at config.toml");
     }
     let config_file = std::fs::read_to_string("config.toml").map_err(|e| e.to_string())?;
-    let config: Config = toml::from_str(&config_file).map_err(|e| e.to_string())?;
+    let mut config: Config = toml::from_str(&config_file).map_err(|e| e.to_string())?;
+    // Provide a default ServerConfig if one is not set.
+    if config.server.is_none() {
+        config.server = Some(ServerConfig { port: 9000 });
+    }
     Ok(config)
 }
 
