@@ -93,7 +93,7 @@ fn load_config() -> Result<Config, String> {
     // If the config file isn't found, create one with default values
     if !std::path::Path::new("config.toml").exists() {
         let default_config = Config {
-            server: Some(ServerConfig { port: 9000 }),
+            server: Some(ServerConfig { port: 9001 }),
             mappings: vec![],
         };
         let toml = toml::to_string_pretty(&default_config).map_err(|e| e.to_string())?;
@@ -104,7 +104,7 @@ fn load_config() -> Result<Config, String> {
     let mut config: Config = toml::from_str(&config_file).map_err(|e| e.to_string())?;
     // Provide a default ServerConfig if one is not set.
     if config.server.is_none() {
-        config.server = Some(ServerConfig { port: 9000 });
+        config.server = Some(ServerConfig { port: 9001 });
     }
     Ok(config)
 }
@@ -112,11 +112,6 @@ fn load_config() -> Result<Config, String> {
 fn handle_packet(packet: OscPacket, mappings: &HashMap<String, EventCache>) {
     match packet {
         OscPacket::Message(msg) => {
-            // Print message
-            println!("OSC Message: {:?}", msg);
-            // Print address
-            println!("OSC Address: {}", msg.addr);
-            // Match event to key
             let reaction = match mappings.get(&msg.addr) {
                 Some(k) => k,
                 None => {
@@ -124,7 +119,6 @@ fn handle_packet(packet: OscPacket, mappings: &HashMap<String, EventCache>) {
                 }
             };
             if reaction.value.is_some() {
-                // If the event has a value, check if the value matches the value in the config
                 if msg.args.len() != 1 {
                     return;
                 }

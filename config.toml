@@ -1,6 +1,3 @@
 [[mapping]]
 event = "/avatar/parameters/MuteSelf"
 key = "F24"
-
-[server]
-port = 9090
